@@ -17,7 +17,7 @@ export CXXFLAGS="${FLAGS}"
 
 # Dependency version numbers
 VERSION_ZLIB=1.2.11
-VERSION_FFI=3.2.1
+VERSION_FFI=3.3
 VERSION_GLIB=2.56.4
 VERSION_XML2=2.9.9
 VERSION_GSF=1.14.46
@@ -26,21 +26,22 @@ VERSION_LCMS2=2.9
 VERSION_JPEG=2.0.3
 VERSION_PNG16=1.6.37
 VERSION_WEBP=1.0.3
-VERSION_TIFF=4.0.10
+VERSION_TIFF=4.1.0
 VERSION_ORC=0.4.29
 VERSION_GETTEXT=0.20.1
 VERSION_GDKPIXBUF=2.36.12
 VERSION_FREETYPE=2.10.1
-VERSION_EXPAT=2.2.8
+VERSION_EXPAT=2.2.9
 VERSION_FONTCONFIG=2.13.92
-VERSION_HARFBUZZ=2.6.1
+VERSION_HARFBUZZ=2.6.4
 VERSION_PIXMAN=0.38.4
 VERSION_CAIRO=1.17.2
-VERSION_FRIBIDI=1.0.5
+VERSION_FRIBIDI=1.0.7
 VERSION_PANGO=1.42.4
 VERSION_CROCO=0.6.13
-VERSION_SVG=2.45.5
+VERSION_SVG=2.46.4
 VERSION_GIF=5.1.4
+VERSION_IMAGEMAGICK="7.0.9-8"
 
 # Least out-of-sync Sourceforge mirror
 SOURCEFORGE_BASE_URL=https://netix.dl.sourceforge.net/project/
@@ -84,7 +85,8 @@ version_latest "fribidi" "$VERSION_FRIBIDI" "857"
 version_latest "croco" "$VERSION_CROCO" "11787"
 #version_latest "svg" "$VERSION_SVG" "5420" latest version fails to link against latest cairo
 #version_latest "gif" "$VERSION_GIF" "1158" # v5.1.5+ provides a Makefile only so will require custom cross-compilation setup
-if [ "$ALL_AT_VERSION_LATEST" = "false" ]; then exit 1; fi
+version_latest "imagemagick" "$VERSION_IMAGEMAGICK" "1372"
+#if [ "$ALL_AT_VERSION_LATEST" = "false" ]; then exit 1; fi
 
 # Download and build dependencies from source
 
@@ -275,6 +277,12 @@ cd ${DEPS}/gif
 ./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking
 make install-strip
 
+mkdir ${DEPS}/imagemagick
+curl -L https://github.com/ImageMagick/ImageMagick/archive/${VERSION_IMAGEMAGICK}.tar.gz | tar xzC ${DEPS}/imagemagick --strip-components=1 
+cd ${DEPS}/imagemagick
+./configure --host=${CHOST} --prefix=${TARGET} --enable-shared --disable-static --disable-dependency-tracking
+make install-strip
+
 mkdir ${DEPS}/vips
 curl -Ls https://github.com/libvips/libvips/releases/download/v${VERSION_VIPS}/vips-${VERSION_VIPS}.tar.gz | tar xzC ${DEPS}/vips --strip-components=1
 cd ${DEPS}/vips
@@ -308,6 +316,7 @@ printf "{\n\
   \"glib\": \"${VERSION_GLIB}\",\n\
   \"gsf\": \"${VERSION_GSF}\",\n\
   \"harfbuzz\": \"${VERSION_HARFBUZZ}\",\n\
+  \"imagemagick\": \"${VERSION_IMAGEMAGICK}\",\n\
   \"jpeg\": \"${VERSION_JPEG}\",\n\
   \"lcms\": \"${VERSION_LCMS2}\",\n\
   \"orc\": \"${VERSION_ORC}\",\n\
